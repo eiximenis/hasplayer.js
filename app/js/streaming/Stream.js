@@ -158,7 +158,7 @@ MediaPlayer.dependencies.Stream = function () {
 
             laURL = event.destinationURL;
             self.debug.log("[DRM] laURL: " + laURL);
-            
+
             // ORANGE: if backUrl is defined, override laURL
             var manifest = self.manifestModel.getValue();
             if(manifest.backUrl) {
@@ -592,7 +592,7 @@ MediaPlayer.dependencies.Stream = function () {
         onPlay = function () {
             this.debug.info("<video> play event");
             this.debug.log("[Stream] Got play event.");
-            
+
             //if a pause command was detected just before this onPlay event, startBuffering again
             //if it was a pause, follow by a seek (in reality just a seek command), don't startBuffering, it's done in onSeeking event
             // we can't, each time, startBuffering in onPlay event (for seek and pause commands) because onPlay event is not fired on IE after a seek command. :-(
@@ -614,7 +614,7 @@ MediaPlayer.dependencies.Stream = function () {
             }
             this.metricsModel.addCondition(null, isFullScreen, videoElement.videoWidth, videoElement.videoHeight);
         },
-        
+
         // ORANGE : ended event
         onEnded = function() {
             this.debug.info("<video> ended event");
@@ -963,7 +963,7 @@ MediaPlayer.dependencies.Stream = function () {
 
             if (audioController) {
                 audioData = audioController.getData();
-                
+
                 // ORANGE: refer only the audio track index to get new audio data (switch audio use case)
                 //if (!!audioData && audioData.hasOwnProperty("id")) {
                 //    deferredAudioData = self.manifestExt.getDataForId(audioData.id, manifest, periodInfo.index);
@@ -1200,7 +1200,8 @@ MediaPlayer.dependencies.Stream = function () {
             this.protectionModel = this.system.getObject("protectionModel");
             this.protectionModel.init(this.getVideoModel());
             this.protectionController = this.system.getObject("protectionController");
-            this.protectionController.init(this.videoModel, this.protectionModel);
+            //this.protectionController.init(this.videoModel, this.protectionModel);
+            this.protectionController.init(this.manifestModel.getValue());
 
             this.protectionModel.listenToNeedKey(needKeyListener);
             this.protectionModel.listenToKeyMessage(keyMessageListener);

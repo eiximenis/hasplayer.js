@@ -196,6 +196,7 @@ MediaPlayer = function (aContext) {
     system.injectInto(context);
 
     return {
+        notifier: undefined,
         debug: undefined,
         eventBus: undefined,
         capabilities: undefined,
@@ -367,7 +368,7 @@ MediaPlayer = function (aContext) {
                 doAutoPlay.call(this);
             }
         },
-        
+
         // ORANGE: add source stream parameters (ex: DRM custom data)
         attachSource: function (url, params) {
             if (!initialized) {
@@ -423,9 +424,11 @@ MediaPlayer.prototype = {
 };
 
 MediaPlayer.dependencies = {};
+MediaPlayer.dependencies.protection = {};
 MediaPlayer.utils = {};
 MediaPlayer.models = {};
 MediaPlayer.vo = {};
 MediaPlayer.vo.metrics = {};
 MediaPlayer.rules = {};
 MediaPlayer.di = {};
+MediaPlayer.vo.protection = {};
