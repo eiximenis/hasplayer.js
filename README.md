@@ -1,5 +1,14 @@
 # hasplayer.js
 
+**All code in this branch (EMEUpdate) is work in progress and does not work yet.**
+
+Aim of this branch is to add the new *EME* specifications to hasplayer to allow playback of MSS and HLS videos using the latest *EME* specs if videos have DRM.
+
+Code about *EME* is taken from dashjs (which has is an extension). But has is based on dashjs 1,2 and new EME code in dashjs is after 1.3 version. And in 1.3 version a **very huge refactor** was aplied to dashjs. So a lot of manual translation is needed.
+
+*Original readme.md starts here*
+-------------------------------------
+
 hasplayer.js is a javascript implementation of a video player based on the W3C premium extensions, i.e. [MSE](https://dvcs.w3.org/hg/html-media/raw-file/tip/media-source/media-source.html) and [EME](https://dvcs.w3.org/hg/html-media/raw-file/tip/encrypted-media/encrypted-media.html).
 
 hasplayer.js is an extension of the [dash.js](https://github.com/Dash-Industry-Forum/dash.js) project with the aim of supporting additional http adaptive streaming protocols such as Microsoft Smooth Streaming protocol and Apple Http Live Streaming.
