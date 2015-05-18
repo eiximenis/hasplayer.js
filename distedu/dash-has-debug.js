@@ -10754,19 +10754,40 @@ MediaPlayer.dependencies.Notifier.prototype = {
 
 MediaPlayer.dependencies.ProtectionController = function() {
     "use strict";
-    var keySystems = null, pendingNeedKeyData = [], audioInfo, videoInfo, onKeyMessage = function(e) {
+    var keySystems = null, pendingNeedKeyData = [], audioInfo, videoInfo, getMediaInfos = function(manifest, contentType) {
+        var data = [];
+        var current = 0;
+        var infos = manifest.Period.AdaptationSet_asArray;
+        for (var idx = 0; idx < infos.length; idx++) {
+            var info = infos[idx];
+            if (info.contentType == contentType) {
+                data.push({
+                    contentType: info.contentType,
+                    mimeType: info.mimeType,
+                    profiles: info.profiles,
+                    contentProtection: info.ContentProtection,
+                    codec: info.codecs ? info.mimeType + ';codecs="' + info.codecs + '"' : info.mimeType,
+                    id: info.id,
+                    index: current,
+                    trackCount: info.Representation_asArray.length
+                });
+                current++;
+            }
+        }
+        return data;
+    }, onKeyMessage = function(e) {
         if (e.error) {
-            this.log(e.error);
+            this.debug.error(e.error);
         } else {
             var keyMessageEvent = e.data;
             this.protectionModel.keySystem.doLicenseRequest(keyMessageEvent.message, keyMessageEvent.defaultURL, keyMessageEvent.sessionToken);
         }
     }, onLicenseRequestComplete = function(e) {
         if (!e.error) {
-            this.log("DRM: License request successful.  Session ID = " + e.data.requestData.getSessionID());
+            this.debug.log("DRM: License request successful.  Session ID = " + e.data.requestData.getSessionID());
             this.updateKeySession(e.data.requestData, e.data.message);
         } else {
-            this.log("DRM: License request failed! -- " + e.error);
+            this.debug.error("DRM: License request failed! -- " + e.error);
         }
     }, onKeySystemSelected = function() {
         this.protectionModel.keySystem.subscribe(MediaPlayer.dependencies.protection.KeySystem.eventList.ENAME_LICENSE_REQUEST_COMPLETE, this);
@@ -10779,7 +10800,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
         pendingNeedKeyData = [];
     }, onNeedKey = function(event) {
         if (event.data.initDataType !== "cenc") {
-            this.log("DRM:  Only 'cenc' initData is supported!  Ignoring initData of type: " + event.data.initDataType);
+            this.debug.log("DRM:  Only 'cenc' initData is supported!  Ignoring initData of type: " + event.data.initDataType);
             return;
         }
         var abInitData = event.data.initData;
@@ -10807,29 +10828,29 @@ MediaPlayer.dependencies.ProtectionController = function() {
         }
     }, onServerCertificateUpdated = function(event) {
         if (!event.error) {
-            this.log("DRM: License server certificate successfully updated.");
+            this.debug.log("DRM: License server certificate successfully updated.");
         } else {
             this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, "DRM: Failed to update license server certificate. -- " + event.error);
         }
     }, onKeySessionCreated = function(event) {
         if (!event.error) {
-            this.log("DRM: Session created.  SessionID = " + event.data.getSessionID());
+            this.debug.log("DRM: Session created.  SessionID = " + event.data.getSessionID());
         } else {
             this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, "DRM: Failed to create key session. -- " + event.error);
         }
     }, onKeyAdded = function() {
-        this.log("DRM: Key added.");
+        this.debug.log("DRM: Key added.");
     }, onKeyError = function(event) {
         this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, "DRM: MediaKeyError - sessionId: " + event.data.sessionToken.getSessionID() + ".  " + event.data.error);
     }, onKeySessionClosed = function(event) {
         if (!event.error) {
-            this.log("DRM: Session closed.  SessionID = " + event.data);
+            this.debug.log("DRM: Session closed.  SessionID = " + event.data);
         } else {
             this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, "DRM Failed to close key session. -- " + event.error);
         }
     }, onKeySessionRemoved = function(event) {
         if (!event.error) {
-            this.log("DRM: Session removed.  SessionID = " + event.data);
+            this.debug.log("DRM: Session removed.  SessionID = " + event.data);
         } else {
             this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR, "DRM: Failed to remove key session. -- " + event.error);
         }
@@ -10843,6 +10864,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
         protectionExt: undefined,
         keySystem: undefined,
         sessionType: "temporary",
+        debug: undefined,
         setup: function() {
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_MESSAGE] = onKeyMessage.bind(this);
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_SELECTED] = onKeySystemSelected.bind(this);
@@ -10867,6 +10889,10 @@ MediaPlayer.dependencies.ProtectionController = function() {
             this.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_CLOSED, this);
             this.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SESSION_REMOVED, this);
             this.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_MESSAGE, this);
+            var videos = getMediaInfos(manifest, "video");
+            var audios = getMediaInfos(manifest, "audio");
+            videoInfo = videos.length > 0 ? videos[0] : undefined;
+            audioInfo = audios.length > 0 ? audios[0] : undefined;
             var cp = manifest.Period.AdaptationSet_asArray[0].ContentProtection_asArray;
             var supportedKS = this.protectionExt.getSupportedKeySystemsFromContentProtection(cp);
             if (supportedKS && supportedKS.length > 0) {
@@ -10883,7 +10909,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
                             }
                         }
                     } else {
-                        self.log("DRM: Could not select key system from ContentProtection elements!  Falling back to needkey mechanism...");
+                        self.debug.log("DRM: Could not select key system from ContentProtection elements!  Falling back to needkey mechanism...");
                         self.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_NEED_KEY, self);
                         self.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_SELECTED, self);
                     }
@@ -10973,7 +10999,7 @@ MediaPlayer.dependencies.ProtectionController.prototype = {
 MediaPlayer.dependencies.ProtectionExtensions = function() {
     "use strict";
     this.system = undefined;
-    this.log = undefined;
+    this.debug = undefined;
     this.keySystems = [];
     this.clearkeyKeySystem = undefined;
 };
@@ -11087,10 +11113,10 @@ MediaPlayer.dependencies.ProtectionExtensions.prototype = {
                 protCtrl.protectionModel.unsubscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE, this);
                 if (!event.error) {
                     var keySystemAccess = event.data;
-                    self.log("KeySystem Access Granted (" + keySystemAccess.keySystem.systemString + ")!");
+                    self.debug.info("KeySystem Access Granted (" + keySystemAccess.keySystem.systemString + ")!");
                     protCtrl.selectKeySystem(keySystemAccess);
                 } else {
-                    self.log(event.error);
+                    self.debug.log(event.error);
                 }
             };
             protCtrl.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE, cbObj);
@@ -14605,6 +14631,19 @@ MediaPlayer.rules.SwitchRequest.prototype = {
     WEAK: 0
 };
 
+MediaPlayer.vo.Event = function() {
+    "use strict";
+    this.type = null;
+    this.sender = null;
+    this.data = null;
+    this.error = null;
+    this.timestamp = NaN;
+};
+
+MediaPlayer.vo.Event.prototype = {
+    constructor: MediaPlayer.vo.Event
+};
+
 MediaPlayer.vo.protection.KeyError = function(sessionToken, errorString) {
     "use strict";
     this.sessionToken = sessionToken;
@@ -14634,6 +14673,35 @@ MediaPlayer.vo.protection.KeySystemConfiguration = function(audioCapabilities, v
 
 MediaPlayer.vo.protection.KeySystemConfiguration.prototype = {
     constructor: MediaPlayer.vo.protection.KeySystemConfiguration
+};
+
+MediaPlayer.vo.protection.MediaCapability = function(contentType, robustness) {
+    this.contentType = contentType;
+    this.robustness = robustness;
+};
+
+MediaPlayer.vo.protection.MediaCapability.prototype = {
+    constructor: MediaPlayer.vo.protection.MediaCapability
+};
+
+MediaPlayer.vo.MediaInfo = function() {
+    "use strict";
+    this.id = null;
+    this.index = null;
+    this.type = null;
+    this.streamInfo = null;
+    this.trackCount = 0;
+    this.lang = null;
+    this.codec = null;
+    this.mimeType = null;
+    this.contentProtection = null;
+    this.isText = false;
+    this.KID = null;
+    this.bitrateList = null;
+};
+
+MediaPlayer.vo.MediaInfo.prototype = {
+    constructor: MediaPlayer.vo.MediaInfo
 };
 
 MediaPlayer.models.MetricsList = function() {

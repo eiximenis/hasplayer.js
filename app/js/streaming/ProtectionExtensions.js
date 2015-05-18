@@ -32,7 +32,7 @@ MediaPlayer.dependencies.ProtectionExtensions = function () {
     "use strict";
 
     this.system = undefined;
-    this.log = undefined;
+    this.debug = undefined;
     this.keySystems = [];
 
     this.clearkeyKeySystem = undefined;
@@ -252,10 +252,10 @@ MediaPlayer.dependencies.ProtectionExtensions.prototype = {
                 protCtrl.protectionModel.unsubscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_ACCESS_COMPLETE, this);
                 if (!event.error) {
                     var keySystemAccess = event.data;
-                    self.log("KeySystem Access Granted (" + keySystemAccess.keySystem.systemString + ")!");
+                    self.debug.info("KeySystem Access Granted (" + keySystemAccess.keySystem.systemString + ")!");
                     protCtrl.selectKeySystem(keySystemAccess);
                 } else {
-                    self.log(event.error);
+                    self.debug.log(event.error);
                 }
             };
 

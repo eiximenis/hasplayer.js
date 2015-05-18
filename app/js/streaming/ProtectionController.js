@@ -36,9 +36,33 @@ MediaPlayer.dependencies.ProtectionController = function () {
         audioInfo,
         videoInfo,
 
+        getMediaInfos = function(manifest, contentType) {
+            var data = [];
+            var current = 0;
+            var infos =  manifest.Period.AdaptationSet_asArray;
+            for (var idx = 0; idx < infos.length; idx++) {
+                var info = infos[idx];
+                if (info.contentType == contentType) {
+                    data.push({
+                        contentType: info.contentType,
+                        mimeType: info.mimeType,
+                        profiles: info.profiles,
+                        contentProtection: info.ContentProtection,
+                        codec: info.codecs ?  info.mimeType + ";codecs=\"" + info.codecs + "\"" : info.mimeType,
+                        id: info.id,
+                        index: current,
+                        trackCount: info.Representation_asArray.length,
+                    });
+                    current++;
+                }
+            }
+
+            return data;
+        },
+
         onKeyMessage = function(e) {
             if (e.error) {
-                this.log(e.error);
+                this.debug.error(e.error);
             } else {
                 var keyMessageEvent = e.data;
                 this.protectionModel.keySystem.doLicenseRequest(keyMessageEvent.message,
@@ -48,10 +72,10 @@ MediaPlayer.dependencies.ProtectionController = function () {
 
         onLicenseRequestComplete = function(e) {
             if (!e.error) {
-                this.log("DRM: License request successful.  Session ID = " + e.data.requestData.getSessionID());
+                this.debug.log("DRM: License request successful.  Session ID = " + e.data.requestData.getSessionID());
                 this.updateKeySession(e.data.requestData, e.data.message);
             } else {
-                this.log("DRM: License request failed! -- " + e.error);
+                this.debug.error("DRM: License request failed! -- " + e.error);
             }
         },
 
@@ -72,7 +96,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
         onNeedKey = function (event) {
             // Ignore non-cenc initData
             if (event.data.initDataType !== "cenc") {
-                this.log("DRM:  Only 'cenc' initData is supported!  Ignoring initData of type: " + event.data.initDataType);
+                this.debug.log("DRM:  Only 'cenc' initData is supported!  Ignoring initData of type: " + event.data.initDataType);
                 return;
             }
 
@@ -115,7 +139,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
 
         onServerCertificateUpdated = function(event) {
             if (!event.error) {
-                this.log("DRM: License server certificate successfully updated.");
+                this.debug.log("DRM: License server certificate successfully updated.");
             } else {
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
                         "DRM: Failed to update license server certificate. -- " + event.error);
@@ -124,7 +148,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
 
         onKeySessionCreated = function(event) {
             if (!event.error) {
-                this.log("DRM: Session created.  SessionID = " + event.data.getSessionID());
+                this.debug.log("DRM: Session created.  SessionID = " + event.data.getSessionID());
             } else {
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
                         "DRM: Failed to create key session. -- " + event.error);
@@ -132,7 +156,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
         },
 
         onKeyAdded = function (/*event*/) {
-            this.log("DRM: Key added.");
+            this.debug.log("DRM: Key added.");
         },
 
         onKeyError = function (event) {
@@ -142,7 +166,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
 
         onKeySessionClosed = function(event) {
             if (!event.error) {
-                this.log("DRM: Session closed.  SessionID = " + event.data);
+                this.debug.log("DRM: Session closed.  SessionID = " + event.data);
             } else {
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
                         "DRM Failed to close key session. -- " + event.error);
@@ -151,7 +175,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
 
         onKeySessionRemoved = function(event) {
             if (!event.error) {
-                this.log("DRM: Session removed.  SessionID = " + event.data);
+                this.debug.log("DRM: Session removed.  SessionID = " + event.data);
             } else {
                 this.notify(MediaPlayer.dependencies.ProtectionController.eventList.ENAME_PROTECTION_ERROR,
                         "DRM: Failed to remove key session. -- " + event.error);
@@ -167,6 +191,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
         protectionExt: undefined,
         keySystem: undefined,
         sessionType: "temporary",
+        debug: undefined,
 
         setup : function () {
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_MESSAGE] = onKeyMessage.bind(this);
@@ -206,7 +231,11 @@ MediaPlayer.dependencies.ProtectionController = function () {
             // Look for ContentProtection elements.  InitData can be provided by either the
             // dash264drm:Pssh ContentProtection format or a DRM-specific format.
             // contentProtection elements are specified at the AdaptationSet level, so the CP for audio
-            // and video will be the same.  Just use one valid MediaInfo object
+            // and video will be the same.
+            var videos  = getMediaInfos(manifest, "video");
+            var audios = getMediaInfos(manifest,"audio");
+            videoInfo = videos.length > 0 ? videos[0] : undefined;
+            audioInfo = audios.length > 0 ? audios[0] : undefined;
             var cp = manifest.Period.AdaptationSet_asArray[0].ContentProtection_asArray;
             var supportedKS = this.protectionExt.getSupportedKeySystemsFromContentProtection(cp);
             if (supportedKS && supportedKS.length > 0) {
@@ -225,7 +254,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
                             }
                         }
                     } else {
-                        self.log("DRM: Could not select key system from ContentProtection elements!  Falling back to needkey mechanism...");
+                        self.debug.log("DRM: Could not select key system from ContentProtection elements!  Falling back to needkey mechanism...");
                         self.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_NEED_KEY, self);
                         self.protectionModel.subscribe(MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_SELECTED, self);
                     }
