@@ -1203,10 +1203,10 @@ MediaPlayer.dependencies.Stream = function () {
             //this.protectionController.init(this.videoModel, this.protectionModel);
             this.protectionController.init(this.manifestModel.getValue());
 
-            this.protectionModel.listenToNeedKey(needKeyListener);
-            this.protectionModel.listenToKeyMessage(keyMessageListener);
-            this.protectionModel.listenToKeyError(keyErrorListener);
-            this.protectionModel.listenToKeyAdded(keyAddedListener);
+           //this.protectionModel.listenToNeedKey(needKeyListener);
+            //this.protectionModel.listenToKeyMessage(keyMessageListener);
+            //this.protectionModel.listenToKeyError(keyErrorListener);
+            //this.protectionModel.listenToKeyAdded(keyAddedListener);
         },
 
         getVideoModel: function() {

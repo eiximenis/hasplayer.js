@@ -12978,10 +12978,6 @@ MediaPlayer.dependencies.Stream = function() {
             this.protectionModel.init(this.getVideoModel());
             this.protectionController = this.system.getObject("protectionController");
             this.protectionController.init(this.manifestModel.getValue());
-            this.protectionModel.listenToNeedKey(needKeyListener);
-            this.protectionModel.listenToKeyMessage(keyMessageListener);
-            this.protectionModel.listenToKeyError(keyErrorListener);
-            this.protectionModel.listenToKeyAdded(keyAddedListener);
         },
         getVideoModel: function() {
             return this.videoModel;
@@ -14792,6 +14788,23 @@ MediaPlayer.vo.SegmentRequest.prototype = {
     constructor: MediaPlayer.vo.SegmentRequest,
     ACTION_DOWNLOAD: "download",
     ACTION_COMPLETE: "complete"
+};
+
+MediaPlayer.models.SessionToken = function() {
+    "use strict";
+};
+
+MediaPlayer.models.SessionToken.prototype = {
+    initData: null,
+    getSessionID: function() {
+        return "";
+    },
+    getExpirationTime: function() {
+        return NaN;
+    },
+    getKeyStatuses: function() {
+        return null;
+    }
 };
 
 MediaPlayer.vo.URIFragmentData = function() {
