@@ -10754,7 +10754,11 @@ MediaPlayer.dependencies.Notifier.prototype = {
 
 MediaPlayer.dependencies.ProtectionController = function() {
     "use strict";
-    var keySystems = null, pendingNeedKeyData = [], audioInfo, videoInfo, getMediaInfos = function(manifest, contentType) {
+    var keySystems = null, pendingNeedKeyData = [], audioInfo, videoInfo, onTeardownKeySystem = function(kid) {
+        if (this.debug) {
+            this.debug.log("teardownKeySystem called kid=" + kid);
+        }
+    }, getMediaInfos = function(manifest, contentType) {
         var data = [];
         var current = 0;
         var infos = manifest.Period.AdaptationSet_asArray;
@@ -10865,6 +10869,7 @@ MediaPlayer.dependencies.ProtectionController = function() {
         keySystem: undefined,
         sessionType: "temporary",
         debug: undefined,
+        teardownKeySystem: onTeardownKeySystem.bind(this),
         setup: function() {
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_MESSAGE] = onKeyMessage.bind(this);
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_SYSTEM_SELECTED] = onKeySystemSelected.bind(this);
@@ -12978,6 +12983,7 @@ MediaPlayer.dependencies.Stream = function() {
             this.protectionModel.init(this.getVideoModel());
             this.protectionController = this.system.getObject("protectionController");
             this.protectionController.init(this.manifestModel.getValue());
+            this.protectionController.setMediaElement(this.getVideoModel().getElement());
         },
         getVideoModel: function() {
             return this.videoModel;
@@ -14648,6 +14654,18 @@ MediaPlayer.vo.protection.KeyError = function(sessionToken, errorString) {
 
 MediaPlayer.vo.protection.KeyError.prototype = {
     constructor: MediaPlayer.vo.protection.KeyError
+};
+
+MediaPlayer.vo.protection.KeyMessage = function(sessionToken, message, defaultURL, messageType) {
+    "use strict";
+    this.sessionToken = sessionToken;
+    this.message = message;
+    this.defaultURL = defaultURL;
+    this.messageType = messageType;
+};
+
+MediaPlayer.vo.protection.KeyMessage.prototype = {
+    constructor: MediaPlayer.vo.protection.KeyMessage
 };
 
 MediaPlayer.vo.protection.KeySystemAccess = function(keySystem, ksConfiguration) {

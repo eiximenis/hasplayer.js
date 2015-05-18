@@ -36,6 +36,14 @@ MediaPlayer.dependencies.ProtectionController = function () {
         audioInfo,
         videoInfo,
 
+
+        onTeardownKeySystem = function (kid) {
+            // TODO: Edu
+            if (this.debug) {
+                this.debug.log('teardownKeySystem called kid=' + kid);
+            }
+        },
+
         getMediaInfos = function(manifest, contentType) {
             var data = [];
             var current = 0;
@@ -192,6 +200,7 @@ MediaPlayer.dependencies.ProtectionController = function () {
         keySystem: undefined,
         sessionType: "temporary",
         debug: undefined,
+        teardownKeySystem: onTeardownKeySystem.bind(this),
 
         setup : function () {
             this[MediaPlayer.models.ProtectionModel.eventList.ENAME_KEY_MESSAGE] = onKeyMessage.bind(this);

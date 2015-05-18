@@ -1202,6 +1202,7 @@ MediaPlayer.dependencies.Stream = function () {
             this.protectionController = this.system.getObject("protectionController");
             //this.protectionController.init(this.videoModel, this.protectionModel);
             this.protectionController.init(this.manifestModel.getValue());
+            this.protectionController.setMediaElement(this.getVideoModel().getElement());
 
            //this.protectionModel.listenToNeedKey(needKeyListener);
             //this.protectionModel.listenToKeyMessage(keyMessageListener);
