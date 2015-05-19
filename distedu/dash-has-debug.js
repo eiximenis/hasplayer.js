@@ -14689,6 +14689,16 @@ MediaPlayer.vo.protection.KeySystemConfiguration.prototype = {
     constructor: MediaPlayer.vo.protection.KeySystemConfiguration
 };
 
+MediaPlayer.vo.protection.LicenseRequestComplete = function(message, requestData) {
+    "use strict";
+    this.message = message;
+    this.requestData = requestData;
+};
+
+MediaPlayer.vo.protection.LicenseRequestComplete.prototype = {
+    constructor: MediaPlayer.vo.protection.LicenseRequestComplete
+};
+
 MediaPlayer.vo.protection.MediaCapability = function(contentType, robustness) {
     this.contentType = contentType;
     this.robustness = robustness;
