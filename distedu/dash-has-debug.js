@@ -5014,6 +5014,7 @@ var mp4lib = function() {
         boxTypeArray["stss"] = mp4lib.boxes.SyncSampleBox;
         boxTypeArray["tref"] = mp4lib.boxes.TrackReferenceBox;
         boxTypeArray["frma"] = mp4lib.boxes.OriginalFormatBox;
+        boxTypeArray["senc"] = mp4lib.boxes.SimpleEncryptionInformationBox;
         boxTypeArray[JSON.stringify([ 109, 29, 155, 5, 66, 213, 68, 230, 128, 226, 20, 29, 175, 247, 87, 178 ])] = mp4lib.boxes.TfxdBox;
         boxTypeArray[JSON.stringify([ 212, 128, 126, 242, 202, 57, 70, 149, 142, 84, 38, 203, 158, 70, 167, 159 ])] = mp4lib.boxes.TfrfBox;
         boxTypeArray[JSON.stringify([ 208, 138, 79, 24, 16, 243, 74, 130, 182, 200, 50, 216, 171, 161, 131, 211 ])] = mp4lib.boxes.PiffProtectionSystemSpecificHeaderBox;
@@ -5502,6 +5503,69 @@ mp4lib.boxes.MovieFragmentBox = function(size) {
 mp4lib.boxes.MovieFragmentBox.prototype = Object.create(mp4lib.boxes.ContainerBox.prototype);
 
 mp4lib.boxes.MovieFragmentBox.prototype.constructor = mp4lib.boxes.MovieFragmentBox;
+
+mp4lib.boxes.SimpleEncryptionInformationBox = function(size) {
+    mp4lib.boxes.ContainerBox.call(this, "senc", size);
+};
+
+mp4lib.boxes.SimpleEncryptionInformationBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
+
+mp4lib.boxes.SimpleEncryptionInformationBox.prototype.constructor = mp4lib.boxes.SimpleEncryptionInformationBox;
+
+mp4lib.boxes.SimpleEncryptionInformationBox.computeLength = function() {
+    mp4lib.boxes.FullBox.prototype.computeLength.call(this);
+    var i = 0, j = 0;
+    this.size += mp4lib.fields.FIELD_UINT32.getLength();
+    for (i = 0; i < this.sample_count; i++) {
+        this.size += 8;
+        if (this.flags & 2) {
+            this.size += mp4lib.fields.FIELD_UINT16.getLength();
+            for (j = 0; j < this.entry[i].NumberOfEntries; j++) {
+                this.size += mp4lib.fields.FIELD_UINT16.getLength();
+                this.size += mp4lib.fields.FIELD_UINT32.getLength();
+            }
+        }
+    }
+};
+
+mp4lib.boxes.SimpleEncryptionInformationBox.prototype.write = function(data, pos) {
+    mp4lib.boxes.FullBox.prototype.write.call(this, data, pos);
+    this._writeData(data, mp4lib.fields.FIELD_UINT32, this.sample_count);
+    for (var i = 0; i < this.sample_count; i++) {
+        this._writeBuffer(data, this.entry[i].InitializationVector, 8);
+        if (this.flags & 2) {
+            this._writeData(data, mp4lib.fields.FIELD_UINT16, this.entry[i].NumberOfEntries);
+            for (var j = 0; j < this.entry[i].NumberOfEntries; j++) {
+                this._writeData(data, mp4lib.fields.FIELD_UINT16, this.entry[i].clearAndCryptedData[j].BytesOfClearData);
+                this._writeData(data, mp4lib.fields.FIELD_UINT32, this.entry[i].clearAndCryptedData[j].BytesOfEncryptedData);
+            }
+        }
+    }
+    return this.localPos;
+};
+
+mp4lib.boxes.SimpleEncryptionInformationBox.prototype.read = function(data, pos, end) {
+    mp4lib.boxes.FullBox.prototype.read.call(this, data, pos, end);
+    this.sample_count = this._readData(data, mp4lib.fields.FIELD_UINT32);
+    this.entry = [];
+    for (var i = 0; i < this.sample_count; i++) {
+        var struct = {};
+        struct.InitializationVector = data.subarray(this.localPos, this.localPos + 8);
+        this.localPos += 8;
+        if (this.flags & 2) {
+            struct.NumberOfEntries = this._readData(data, mp4lib.fields.FIELD_UINT16);
+            struct.clearAndCryptedData = [];
+            for (var j = 0; j < struct.NumberOfEntries; j++) {
+                var clearAndCryptedStruct = {};
+                clearAndCryptedStruct.BytesOfClearData = this._readData(data, mp4lib.fields.FIELD_UINT16);
+                clearAndCryptedStruct.BytesOfEncryptedData = this._readData(data, mp4lib.fields.FIELD_UINT32);
+                struct.clearAndCryptedData.push(clearAndCryptedStruct);
+            }
+        }
+        this.entry.push(struct);
+    }
+    return this.localPos;
+};
 
 mp4lib.boxes.MovieFragmentRandomAccessBox = function(size) {
     mp4lib.boxes.ContainerBox.call(this, "mfra", size);
@@ -20624,6 +20688,8 @@ Mss.dependencies.MssFragmentController = function() {
             }
             traf.boxes.push(saiz);
             traf.boxes.push(saio);
+        } else {
+            sepiff = traf.getBoxByType("senc");
         }
         tfhd.track_ID = trackId;
         traf.removeBoxByType("tfxd");
@@ -20651,6 +20717,9 @@ Mss.dependencies.MssFragmentController = function() {
             var moofpositionInFragment = fragment.getBoxPositionByType("moof") + 8;
             var trafpositionInMoof = moof.getBoxPositionByType("traf") + 8;
             var sencpositionInTraf = traf.getBoxPositionByType("senc") + 8;
+            if (saio == undefined) {
+                saio = traf.getBoxByType("saio");
+            }
             saio.offset[0] = moofpositionInFragment + trafpositionInMoof + sencpositionInTraf + 8;
         }
         var fragment_size = fragment.getLength();
