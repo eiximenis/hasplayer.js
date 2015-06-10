@@ -131,11 +131,10 @@ Mss.dependencies.MssFragmentController = function () {
             var traf = moof.getBoxByType("traf");
             var trun = traf.getBoxByType("trun");
             var tfhd = traf.getBoxByType("tfhd");
-            var saio;
+            var saio = null;
 
-            //if protected content
+            //if PIFF1.1 protected content
             var sepiff = traf.getBoxByType("sepiff");
-
             if(sepiff !== null) {
                 sepiff.boxtype = "senc";
                 sepiff.extended_type = undefined;
@@ -183,9 +182,10 @@ Mss.dependencies.MssFragmentController = function () {
                 traf.boxes.push(saiz);
                 traf.boxes.push(saio);
             }
-            else {
-                sepiff = traf.getBoxByType("senc");         // Maybe we are in PIFF1.3
-            }
+
+            // At this point sepiff will have value if we are in PIFF1.1 and have encrypted
+            // content, or will be undefined if we don't have encrypted content or we are
+            // in PIFF1.3 (regardless is we have or not encrypted content in PIFF1.3).
 
             // Update tfhd.track_ID field
             tfhd.track_ID = trackId;

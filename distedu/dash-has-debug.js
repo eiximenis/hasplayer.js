@@ -5512,7 +5512,7 @@ mp4lib.boxes.SimpleEncryptionInformationBox.prototype = Object.create(mp4lib.box
 
 mp4lib.boxes.SimpleEncryptionInformationBox.prototype.constructor = mp4lib.boxes.SimpleEncryptionInformationBox;
 
-mp4lib.boxes.SimpleEncryptionInformationBox.computeLength = function() {
+mp4lib.boxes.SimpleEncryptionInformationBox.prototype.computeLength = function() {
     mp4lib.boxes.FullBox.prototype.computeLength.call(this);
     var i = 0, j = 0;
     this.size += mp4lib.fields.FIELD_UINT32.getLength();
@@ -20653,7 +20653,7 @@ Mss.dependencies.MssFragmentController = function() {
         var traf = moof.getBoxByType("traf");
         var trun = traf.getBoxByType("trun");
         var tfhd = traf.getBoxByType("tfhd");
-        var saio;
+        var saio = null;
         var sepiff = traf.getBoxByType("sepiff");
         if (sepiff !== null) {
             sepiff.boxtype = "senc";
@@ -20688,8 +20688,6 @@ Mss.dependencies.MssFragmentController = function() {
             }
             traf.boxes.push(saiz);
             traf.boxes.push(saio);
-        } else {
-            sepiff = traf.getBoxByType("senc");
         }
         tfhd.track_ID = trackId;
         traf.removeBoxByType("tfxd");
@@ -20717,9 +20715,6 @@ Mss.dependencies.MssFragmentController = function() {
             var moofpositionInFragment = fragment.getBoxPositionByType("moof") + 8;
             var trafpositionInMoof = moof.getBoxPositionByType("traf") + 8;
             var sencpositionInTraf = traf.getBoxPositionByType("senc") + 8;
-            if (saio == undefined) {
-                saio = traf.getBoxByType("saio");
-            }
             saio.offset[0] = moofpositionInFragment + trafpositionInMoof + sencpositionInTraf + 8;
         }
         var fragment_size = fragment.getLength();

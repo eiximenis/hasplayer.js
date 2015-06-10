@@ -558,7 +558,7 @@ mp4lib.boxes.SimpleEncryptionInformationBox = function(size) {
 mp4lib.boxes.SimpleEncryptionInformationBox.prototype = Object.create(mp4lib.boxes.FullBox.prototype);
 mp4lib.boxes.SimpleEncryptionInformationBox.prototype.constructor = mp4lib.boxes.SimpleEncryptionInformationBox;
 
-mp4lib.boxes.SimpleEncryptionInformationBox.computeLength = function() {
+mp4lib.boxes.SimpleEncryptionInformationBox.prototype.computeLength = function() {
     mp4lib.boxes.FullBox.prototype.computeLength.call(this);
     var i = 0, j = 0;
 
