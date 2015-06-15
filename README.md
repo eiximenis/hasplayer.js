@@ -1,10 +1,13 @@
 # hasplayer.js
 
-**All code in this branch (EMEUpdate) is work in progress and does not work yet.**
+Branch *EMEUpdate*
 
 Aim of this branch is to add the new *EME* specifications to hasplayer to allow playback of MSS and HLS videos using the latest *EME* specs if videos have DRM.
 
 Code about *EME* is taken from dashjs (which has is an extension). But has is based on dashjs 1,2 and new EME code in dashjs is after 1.3 version. And in 1.3 version a **very huge refactor** was aplied to dashjs. So a lot of manual translation is needed.
+
+Also, support for MSS streams in *PIFF1.3* format is added. Support for PIFF1.3 allows playing MSS streams hosted in Azure Media Services.
+
 
 *Original readme.md starts here*
 -------------------------------------
@@ -15,7 +18,7 @@ hasplayer.js is an extension of the [dash.js](https://github.com/Dash-Industry-F
 
 If your intent is to use the player code without contributing back to this project, then use the MASTER branch which holds the approved and stable public releases.
 
-If your goal is to improve or extend the code and contribute back to this project, then you should make your changes in, and submit a pull request against, the DEVELOPMENT branch. 
+If your goal is to improve or extend the code and contribute back to this project, then you should make your changes in, and submit a pull request against, the DEVELOPMENT branch.
 
 ## Quick Start
 
@@ -35,7 +38,7 @@ If your goal is to improve or extend the code and contribute back to this projec
 
 1. Change directories to the build folder
     * cd build/
-2. Install all Node Modules defined in package.json 
+2. Install all Node Modules defined in package.json
     * npm install
 3. Run build task
     * grunt build
