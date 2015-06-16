@@ -13,10 +13,10 @@
             width: 100%;
         }
 
-        * { 
+        * {
             -webkit-box-sizing: border-box;
             -moz-box-sizing: border-box;
-            box-sizing: border-box; 
+            box-sizing: border-box;
         }
 
         body {
@@ -51,7 +51,7 @@
         .ui-widget {font-family: Trebuchet MS,Tahoma,Verdana,Arial,sans-serif;}
         .ui-widget-header {border: 1px solid #e78f08;background: #2980B9 ;color: #fff;font-weight: bold;}
         .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {border: 1px solid #ccc;background: #f6f6f6 50% 50% repeat-x;font-weight: bold;color: #1c94c4;}
-        
+
         .ui-slider .ui-slider-handle {
             position: absolute;
             z-index: 3;
@@ -275,7 +275,7 @@
             outline: none;
             padding: 5px;
         }
-        
+
         .button {
             border-width: 0 1px 0 0;
             border-style: dotted;
@@ -315,7 +315,7 @@
 </head>
 <div id="videoContainer" class="videoContainer">
 
-    <div id="chartToToggle" class="chartContainer container"> 
+    <div id="chartToToggle" class="chartContainer container">
         <div id="playingInfos" class="infos">
             <span class='playingTitle'>Playing</span><br>
             <span id="playingBandwidth"></span><br>
@@ -354,6 +354,7 @@
 <script src="../../app/lib/log4javascript.js"></script>
 <!--<!(endif)-->
 
+
 <script src="../../app/lib/q.js"></script>
 <script src="../../app/lib/xml2json.js"></script>
 <script src="../../app/lib/objectiron.js"></script>
@@ -380,6 +381,7 @@
 
 <script src="../../app/js/streaming/MediaPlayer.js"></script>
 <script src="../../app/js/streaming/Context.js"></script>
+<script src="../../app/js/streaming/Notifier.js"></script>
 <script src="../../app/js/streaming/ErrorHandler.js"></script>
 <script src="../../app/js/streaming/Capabilities.js"></script>
 <script src="../../app/js/streaming/EventBus.js"></script>
@@ -406,6 +408,9 @@
 <script src="../../app/js/streaming/Stream.js"></script>
 <script src="../../app/js/streaming/BufferController.js"></script>
 <script src="../../app/js/streaming/ProtectionModel.js"></script>
+<script src="../../app/js/streaming/ProtectionModel_01b.js"></script>
+<script src="../../app/js/streaming/ProtectionModel_3Feb2014.js"></script>
+<script src="../../app/js/streaming/ProtectionModel_21Jan2015.js"></script>
 <script src="../../app/js/streaming/ProtectionController.js"></script>
 <script src="../../app/js/streaming/ProtectionExtensions.js"></script>
 <script src="../../app/js/streaming/rules/SwitchRequest.js"></script>
@@ -419,6 +424,14 @@
 
 <script src="../../app/js/streaming/vo/Mp4Track.js"></script>
 <script src="../../app/js/streaming/Mp4Processor.js"></script>
+
+<script src="../../app/js/streaming/drm/CommonEncryption.js"></script>
+<script src="../../app/js/streaming/drm/KeySystem.js"></script>
+<script src="../../app/js/streaming/drm/KeySystem_Access.js"></script>
+<script src="../../app/js/streaming/drm/KeySystem_ClearKey.js"></script>
+<script src="../../app/js/streaming/drm/KeySystem_PlayReady.js"></script>
+<script src="../../app/js/streaming/drm/KeySystem_Widevine.js"></script>
+
 
 <script src="../../app/js/streaming/captioning/VTTParser.js"></script>
 <script src="../../app/js/streaming/captioning/TTMLParser.js"></script>
@@ -437,6 +450,18 @@
 <script src="../../app/js/streaming/vo/metrics/RepresentationSwitch.js"></script>
 <script src="../../app/js/streaming/vo/metrics/TCPConnection.js"></script>
 
+<script src="../../app/js/streaming/vo/Event.js"></script>
+<script src="../../app/js/streaming/vo/NeedKey.js"></script>
+<script src="../../app/js/streaming/vo/KeyError.js"></script>
+<script src="../../app/js/streaming/vo/KeyMessage.js"></script>
+<script src="../../app/js/streaming/vo/KeySystemAccess.js"></script>
+<script src="../../app/js/streaming/vo/KeySystemConfiguration.js"></script>
+<script src="../../app/js/streaming/vo/LicenseRequestComplete.js"></script>
+<script src="../../app/js/streaming/vo/MediaCapability.js"></script>
+<script src="../../app/js/streaming/vo/MediaInfo.js"></script>
+<script src="../../app/js/streaming/vo/SessionToken.js"></script>
+
+
 <script src="../../app/js/dash/Dash.js"></script>
 <script src="../../app/js/dash/DashContext.js"></script>
 <script src="../../app/js/dash/vo/Mpd.js"></script>
@@ -446,6 +471,8 @@
 <script src="../../app/js/dash/vo/Segment.js"></script>
 <script src="../../app/js/dash/vo/Event.js"></script>
 <script src="../../app/js/dash/vo/EventStream.js"></script>
+
+<script src="../../app/js/dash/DashAdapter.js"></script>
 <script src="../../app/js/dash/DashParser.js"></script>
 <script src="../../app/js/dash/DashHandler.js"></script>
 <script src="../../app/js/dash/BaseURLExtensions.js"></script>

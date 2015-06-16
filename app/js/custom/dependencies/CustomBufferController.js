@@ -1,15 +1,15 @@
 /*
  * The copyright in this software module is being made available under the BSD License, included below. This software module may be subject to other third party and/or contributor rights, including patent rights, and no such rights are granted under this license.
  * The whole software resulting from the execution of this software module together with its external dependent software modules from dash.js project may be subject to Orange and/or other third party rights, including patent rights, and no such rights are granted under this license.
- * 
+ *
  * Copyright (c) 2014, Orange
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
  * •  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  * •  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
  * •  Neither the name of the Orange nor the names of its contributors may be used to endorse or promote products derived from this software module without specific prior written permission.
- * 
+ *
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
@@ -142,11 +142,11 @@ Custom.dependencies.CustomBufferController = function () {
             }
 
             started = true;
-            
+
             self.debug.info("[BufferController]["+type+"] ### START");
 
             waitingForBuffer = true;
-        
+
             startPlayback.call(self);
         },
 
@@ -197,14 +197,14 @@ Custom.dependencies.CustomBufferController = function () {
             //Reset htmlVideoState in order to update it after a pause or seek command in UpdateBufferState function
             htmlVideoState = -1;
 
-            // Stop buffering process            
+            // Stop buffering process
             clearTimeout(bufferTimeout);
             started = false;
             waitingForBuffer = false;
 
             // Stop buffering process and cancel loaded request
             clearPlayListTraceMetrics(new Date(), MediaPlayer.vo.metrics.PlayList.Trace.USER_REQUEST_STOP_REASON);
-            
+
             this.fragmentController.abortRequestsForModel(fragmentModel);
         },
 
@@ -294,7 +294,7 @@ Custom.dependencies.CustomBufferController = function () {
                                 appendToBuffer.call(self, data, request.quality, request.index).then(
                                     function() {
                                         self.debug.log("[BufferController]["+type+"] ### Media segment buffered");
-                                        // Signal end of buffering process 
+                                        // Signal end of buffering process
                                         signalSegmentBuffered.call(self);
                                         // Check buffer level
                                         checkIfSufficientBuffer.call(self);
@@ -304,7 +304,7 @@ Custom.dependencies.CustomBufferController = function () {
                         );
                     } else {
                         self.debug.log("[BufferController]["+type+"] Error with segment data, no bytes to push");
-                        // Signal end of buffering process 
+                        // Signal end of buffering process
                         signalSegmentBuffered.call(self);
                         // Check buffer level
                         checkIfSufficientBuffer.call(self);
@@ -326,8 +326,8 @@ Custom.dependencies.CustomBufferController = function () {
                 playListTraceMetricsClosed = false;
                 playListTraceMetrics = self.metricsModel.appendPlayListTrace(playListMetrics, currentRepresentation.id, null, currentTime, currentVideoTime, null, 1.0, null);
             }
-            
-            if (!hasData()) return;
+
+            if (!hasData()) return deferred.promise;
             hasEnoughSpaceToAppend.call(self).then(
                 function() {
                     Q.when(deferredBuffersFlatten ? deferredBuffersFlatten.promise : true).then(
@@ -672,7 +672,7 @@ Custom.dependencies.CustomBufferController = function () {
         loadInitialization = function () {
             var deferred = Q.defer(),
                 self = this;
-            
+
             // Check if initialization segment for current quality has not already been stored
             if (initializationData[currentQuality]) {
                 self.debug.info("[BufferController]["+type+"] ### Buffer initialization segment, quality = ", currentQuality);
@@ -739,7 +739,7 @@ Custom.dependencies.CustomBufferController = function () {
         onFragmentRequest = function (request) {
             var self = this,
                 manifest = self.manifestModel.getValue();
-            
+
             // Check if current request signals end of stream
             if ((request !== null) && (request.action === request.ACTION_COMPLETE)) {
                 signalStreamComplete.call(self);
@@ -855,7 +855,7 @@ Custom.dependencies.CustomBufferController = function () {
             }
 
             self.debug.log("[BufferController]["+type+"] Check buffer...");
-            
+
             updateBufferLevel.call(self);
 
             // videoModel in stalled mode
@@ -905,7 +905,7 @@ Custom.dependencies.CustomBufferController = function () {
                 function (dataUpdated) {
                     // If data has been changed, then load initialization segment
                     var loadInit = dataUpdated;
-                    
+
                     // Get current quality
                     self.abrController.getPlaybackQuality(type, data).then(
                         function (result) {
@@ -1111,7 +1111,7 @@ Custom.dependencies.CustomBufferController = function () {
                             currentRepresentation = getRepresentationForQuality.call(self, result.quality);
 
                             fragmentDuration = currentRepresentation.segmentDuration;
-                            
+
                             self.indexHandler.setIsDynamic(isDynamic);
                             self.bufferExt.decideBufferLength(manifest.minBufferTime, periodInfo.duration, waitingForBuffer).then(
                                 function (time) {
@@ -1236,7 +1236,7 @@ Custom.dependencies.CustomBufferController = function () {
                         removeBuffer.call(self, seekTime).then(
                             function() {
                                 debugBufferRange.call(self);
-                                // => restart 
+                                // => restart
                                 doSeek.call(self, seekTime);
                                 deferred.resolve();
                             }
