@@ -64,7 +64,7 @@ MediaPlayer.models.ProtectionModel_3Feb2014 = function () {
         // readyState, so we need this logic to ensure we don't set the keys
         // too early
         setMediaKeys = function() {
-            // IE11 does not allow setting of media keys until
+
             var doSetKeys = function() {
                 videoElement[api.setMediaKeys](mediaKeys);
                 this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_VIDEO_ELEMENT_SELECTED);
