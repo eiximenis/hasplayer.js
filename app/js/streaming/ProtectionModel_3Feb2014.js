@@ -67,12 +67,13 @@ MediaPlayer.models.ProtectionModel_3Feb2014 = function () {
 
             var doSetKeys = function() {
                 videoElement[api.setMediaKeys](mediaKeys);
+                videoElement.removeEventListener("loadedmetadata", doSetKeys);
                 this.notify(MediaPlayer.models.ProtectionModel.eventList.ENAME_VIDEO_ELEMENT_SELECTED);
-            };
+            }.bind(this);
             if (videoElement.readyState >= 1) {
-                doSetKeys.call(this);
+                doSetKeys();
             } else {
-                videoElement.addEventListener("loadedmetadata", doSetKeys.bind(this));
+                videoElement.addEventListener("loadedmetadata", doSetKeys);
             }
 
         },
@@ -128,6 +129,7 @@ MediaPlayer.models.ProtectionModel_3Feb2014 = function () {
         unsubscribe: undefined,
         protectionExt: undefined,
         keySystem: null,
+        setMediaKeys : setMediaKeys,
 
         setup: function() {
             eventHandler = createEventHandler.call(this);
