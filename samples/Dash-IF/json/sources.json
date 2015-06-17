@@ -14,20 +14,62 @@
         },
         {
             "type": "MSS",
-            "name": "VOD - SuperSpeedway",
+            "name": "VOD - SuperSpeedway - UNencrypted",
             "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264/SuperSpeedway_720.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
             "type": "MSS",
-            "name": "VOD - SuperSpeedway (PlayReady)",
+            "name": "VOD - SuperSpeedway - PlayReady",
             "url": "http://playready.directtaps.net/smoothstreaming/SSWSS720H264PR/SuperSpeedway_720.ism/Manifest",
             "browsers": "cdsbi"
         },
         {
             "type": "MSS",
-            "name": "VOD - Elephants Dream (multi-audio/text)",
-            "url": "http://streams.smooth.vertigo.com/elephantsdream/Elephants_Dream_1024-h264-st-aac.ism/manifest",
+            "name": "Starwars trailer (AMS - PIFF1.3) - UNencrypted",
+            "url": "http://emepolyfill.streaming.mediaservices.windows.net/58869205-ea73-4473-ab5f-b9005a443eee/starwars.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
+            "name": "Starwars trailer (AMS - PIFF1.3) - PlayReady",
+            "url": "http://emepolyfill.streaming.mediaservices.windows.net/fc852e9a-07ee-469d-ac91-a4cc164e3f36/starwars.ism/Manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
+            "name": "Sintel Trailer 1080p - PlayReady",
+            "url": "http://wams.edgesuite.net/media/SintelTrailer_Smooth_from_WAME_CENC/NoSubSampleAdjustment/sintel_trailer-1080p.ism/manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
+            "name": "Tears of steel teaser (amssamples) - UNencrypted",
+            "url": "http://amssamples.streaming.mediaservices.windows.net/3d7eaff9-39fa-442f-81cc-f2ea7db1797e/TearsOfSteelTeaser.ism/manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
+            "name": "Tears of steel (amssamples) - UNencrypted",
+            "url": "http://amssamples.streaming.mediaservices.windows.net/bc57e088-27ec-44e0-ac20-a85ccbcd50da/TearsOfSteel.ism/manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
+            "name": "ElephantsDream (amssamples) - UNencrypted",
+            "url": "http://amssamples.streaming.mediaservices.windows.net/b6822ec8-5c2b-4ae0-a851-fd46a78294e9/ElephantsDream.ism/manifest(filtername=FirstFilter)",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
+            "name": "Azure Promo (amssamples) - UNencrypted",
+            "url": "http://amssamples.streaming.mediaservices.windows.net/69fbaeba-8e92-4740-aedc-ce09ae945073/AzurePromo.ism/manifest",
+            "browsers": "cdsbi"
+        },
+        {
+            "type": "MSS",
+            "name": "Azure Media Services Promo (amssamples) - UNencrypted",
+            "url": "http://amssamples.streaming.mediaservices.windows.net/91492735-c523-432b-ba01-faba6c2206a2/AzureMediaServicesPromo.ism/manifest",
             "browsers": "cdsbi"
         },
         {
